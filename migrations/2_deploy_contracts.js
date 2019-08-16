@@ -8,7 +8,13 @@ module.exports = async function(deployer, network, accounts) {
   await deployer.deploy(TelegramFuturesToken, { from: masterAccount });
   await TelegramFuturesToken.deployed();
 
-  await deployer.deploy(TelegramToken, { from: masterAccount });
+  console.log({
+    deployedFuturesAddress: TelegramFuturesToken.address
+  });
+
+  await deployer.deploy(TelegramToken, TelegramFuturesToken.address, {
+    from: masterAccount
+  });
   await TelegramToken.deployed();
 
   await deployer.deploy(
@@ -19,5 +25,5 @@ module.exports = async function(deployer, network, accounts) {
   );
   await TokenSwap.deployed();
 
-  console.log(TelegramToken);
+  // console.log(TelegramToken);
 };
