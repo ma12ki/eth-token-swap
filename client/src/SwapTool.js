@@ -1,13 +1,21 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Button } from "react-bootstrap";
+import { InputGroup, FormControl, Button } from "react-bootstrap";
 
 import "./App.css";
 
 function SwapTool({ web3, futuresContract, targetContract, account }) {
   const [futuresBalance, setFuturesBalance] = useState(0);
   const [targetBalance, setTargetBalance] = useState(0);
+  const [swapAmount, setSwapAmount] = useState("");
   const [swapping, setSwapping] = useState(false);
   const [swapReceipt, setSwapReceipt] = useState({});
+
+  const handleAll = useCallback(() => {
+    setSwapAmount(futuresBalance);
+  }, [futuresBalance]);
+  const handleSwapAmountChange = useCallback(event => {
+    setSwapAmount(event.target.value || "");
+  }, []);
 
   const handleSwap = useCallback(async () => {
     // experimenting with batches - order of execution does not seem to be guaranteed :(
@@ -36,7 +44,7 @@ function SwapTool({ web3, futuresContract, targetContract, account }) {
     setSwapping(true);
 
     futuresContract.methods
-      .approve(targetContract._address, 100)
+      .approve(targetContract._address, swapAmount)
       .send()
       .on("transactionHash", function(hash) {
         console.log("hash", hash);
@@ -52,7 +60,7 @@ function SwapTool({ web3, futuresContract, targetContract, account }) {
 
     function executeSwap() {
       targetContract.methods
-        .swap(100)
+        .swap(swapAmount)
         .send()
         .on("transactionHash", function(hash) {
           console.log("hash", hash);
@@ -79,6 +87,7 @@ function SwapTool({ web3, futuresContract, targetContract, account }) {
     }
   }, [
     futuresContract.methods,
+    swapAmount,
     targetContract._address,
     targetContract.methods
   ]);
@@ -97,13 +106,35 @@ function SwapTool({ web3, futuresContract, targetContract, account }) {
   return (
     <div>
       <div>Your xGRAM balance is {futuresBalance}</div>
-      <Button
-        variant="outline-light"
-        disabled={futuresBalance === 0 || swapping}
-        onClick={handleSwap}
-      >
-        {swapping ? "Swapping..." : "Swap"}
-      </Button>
+      <br />
+      <InputGroup>
+        <FormControl
+          placeholder="Amount to swap"
+          type="number"
+          min="0"
+          max={futuresBalance}
+          value={swapAmount}
+          disabled={swapping}
+          onChange={handleSwapAmountChange}
+        />
+        <InputGroup.Append>
+          <Button
+            variant="outline-light"
+            disabled={swapping}
+            onClick={handleAll}
+          >
+            All
+          </Button>
+          <Button
+            variant="outline-light"
+            disabled={futuresBalance === 0 || swapping}
+            onClick={handleSwap}
+          >
+            {swapping ? "Swapping..." : "Swap"}
+          </Button>
+        </InputGroup.Append>
+      </InputGroup>
+      <br />
       <div>Your TON balance is {targetBalance}</div>
     </div>
   );
