@@ -25,12 +25,11 @@ function App() {
           <div>{context.account}</div>
           <br />
           <ContractProvider web3={context.library} account={context.account}>
-            {({ futuresContract, targetContract, swapContract }) => (
+            {({ futuresContract, targetContract }) => (
               <SwapTool
                 web3={context.library}
                 futuresContract={futuresContract}
                 targetContract={targetContract}
-                swapContract={swapContract}
                 account={context.account}
               />
             )}
