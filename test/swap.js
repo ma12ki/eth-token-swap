@@ -2,14 +2,11 @@ const truffleAssert = require("truffle-assertions");
 
 const TelegramFuturesToken = artifacts.require("TelegramFuturesToken");
 const TelegramToken = artifacts.require("TelegramToken");
-const TokenSwap = artifacts.require("TokenSwap");
 
 contract("Swap", function(accounts) {
   let telegramFutures;
   let telegram;
-  let tokenSwap;
-  const masterAccount = accounts[0];
-  const clientAccount = accounts[1];
+  const [masterAccount, clientAccount] = accounts;
 
   console.log({
     masterAccount,
